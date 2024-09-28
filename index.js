@@ -104,13 +104,13 @@ app.get("/", (req, res) => {
   res.send(JSON.stringify(response));
 });
 
-app.get("/add-questions", (req, res) => {
+app.get("/api/add-questions", (req, res) => {
   parseData();
 
   res.send("parsing data");
 });
 
-app.get("/questions", async (req, res) => {
+app.get("/api/questions", async (req, res) => {
   try {
     await client.connect();
     const dbName = "jsgoat";
