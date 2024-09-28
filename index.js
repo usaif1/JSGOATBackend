@@ -4,6 +4,9 @@ const port = 3000;
 const fs = require("fs");
 const { MongoClient, ServerApiVersion } = require("mongodb");
 const path = require("path");
+const NodeCache = require("node-cache");
+
+const cache = new NodeCache({ stdTTL: 3600 }); // Cache for 1 hour
 
 const uri =
   "mongodb+srv://saif:URXy6WULU2vVmXJT@jsgoat.ldjhu.mongodb.net/?retryWrites=true&w=majority&appName=JSGOAT&tls=true";
@@ -128,12 +131,19 @@ app.get("/api/add-questions", (req, res) => {
 
 // In your API endpoint:
 app.get("/api/questions", async (req, res) => {
+  const cachedQuestions = cache.get("questions");
+
+  if (cachedQuestions) {
+    return res.send(cachedQuestions);
+  }
+
   try {
     const database = await connectToDatabase(); // Reuse the connection
     const collection = database.collection("js_output_questions");
     const documents = await collection.find({}).toArray();
+
+    cache.set("questions", documents);
     res.send(documents);
-    console.log("documents", documents);
   } catch (err) {
     console.error(
       `Something went wrong trying to read the documents: ${err}\n`
