@@ -97,6 +97,13 @@ const parseData = async () => {
   }
 };
 
+app.get("/", (req, res) => {
+  const response = {
+    data: "hello world!",
+  };
+  res.send(JSON.stringify(response));
+});
+
 app.get("/add-questions", (req, res) => {
   parseData();
 
