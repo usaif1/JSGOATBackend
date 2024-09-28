@@ -16,6 +16,22 @@ const client = new MongoClient(uri, {
   },
 });
 
+let db; // Store the database connection globally
+
+async function connectToDatabase() {
+  if (!db) {
+    try {
+      await client.connect();
+      const dbName = "jsgoat";
+      db = client.db(dbName); // Store the connected database
+    } catch (err) {
+      console.error("Error connecting to MongoDB:", err);
+      throw err;
+    }
+  }
+  return db;
+}
+
 function parseMarkdown(content) {
   const questions = [];
   const questionRegex =
@@ -110,27 +126,19 @@ app.get("/api/add-questions", (req, res) => {
   res.send("parsing data");
 });
 
+// In your API endpoint:
 app.get("/api/questions", async (req, res) => {
   try {
-    await client.connect();
-    const dbName = "jsgoat";
-    const collectionName = "js_output_questions";
-
-    // Create references to the database and collection.
-    const database = client.db(dbName);
-    const collection = database.collection(collectionName);
-
-    // Query the collection to get all documents.
+    const database = await connectToDatabase(); // Reuse the connection
+    const collection = database.collection("js_output_questions");
     const documents = await collection.find({}).toArray();
     res.send(documents);
-
     console.log("documents", documents);
   } catch (err) {
     console.error(
       `Something went wrong trying to read the documents: ${err}\n`
     );
-  } finally {
-    await client.close();
+    res.status(500).send("Internal Server Error");
   }
 });
 
