@@ -5,8 +5,16 @@ const fs = require("fs");
 const { MongoClient, ServerApiVersion } = require("mongodb");
 const path = require("path");
 const NodeCache = require("node-cache");
+const cors = require("cors");
 
 const cache = new NodeCache({ stdTTL: 3600 }); // Cache for 1 hour
+// Use CORS to allow requests from your frontend
+const corsOptions = {
+  origin: "http://localhost:3000", // Frontend URL
+  optionsSuccessStatus: 200,
+};
+
+app.use(cors(corsOptions)); // Enable CORS for this origin
 
 const uri =
   "mongodb+srv://saif:URXy6WULU2vVmXJT@jsgoat.ldjhu.mongodb.net/?retryWrites=true&w=majority&appName=JSGOAT&tls=true";
